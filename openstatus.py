@@ -12,6 +12,7 @@ import re
 import commands
 import json
 import datetime
+import requests
 
 class Collector(object):
 
@@ -97,22 +98,11 @@ class Collector(object):
                             "hosts": self.hosts
                          })
 
+	r = requests.post('http://dashboard.k4cg.org/api/events', json={ "type":"Geraete in der K4CG", "properties": { "devices": len(self.hosts) } } )
+
         with open(self.json, "w") as f:
             f.write(doc)
             f.close()
-
-        # For Stats reasons, we write the current devices to
-        # a json file called history.json with a timestamp
-        try:
-            with open(self.history, "r") as f:
-                h = json.load(f)
-                f.close()
-        except IOError:
-            h = dict()
-
-        with open(self.history, "w") as f:
-            h[str(datetime.datetime.now())] = doc
-            json.dump(h, f)
 
         return True
 
