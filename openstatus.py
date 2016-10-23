@@ -33,6 +33,9 @@ class Collector(object):
                                '10.88.88.17', # Hue
                                '10.88.88.14', # Raspi Temperatur
                                '10.88.88.10', # matomat
+                               '10.88.88.18', # WLAN AP
+			                   '10.88.88.233', # iPad - noqqe 20161022
+			                   '10.88.88.64', # KEINE AHNUNG - noqqe 20161022
                             ]
         # for performance reasons, we currently disable nmap
         # self.scan_nmap()
@@ -97,8 +100,6 @@ class Collector(object):
                             "online": len(self.hosts),
                             "hosts": self.hosts
                          })
-
-	r = requests.post('http://dashboard.k4cg.org/api/events', json={ "type":"Geraete in der K4CG", "properties": { "devices": len(self.hosts) } } )
 
         with open(self.json, "w") as f:
             f.write(doc)
