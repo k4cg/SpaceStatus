@@ -14,29 +14,35 @@ import json
 import datetime
 import requests
 
-class Collector(object):
+from tinkerforge.ip_connection import IPConnection
+from tinkerforge.bricklet_temperature import BrickletTemperature
+from tinkerforge.bricklet_accelerometer import BrickletAccelerometer
+from tinkerforge.bricklet_sound_intensity import BrickletSoundIntensity
+from tinkerforge.bricklet_uv_light import BrickletUVLight
 
-    """Docstring for Collector. """
+class NetworkScanner(object):
+    """
+    Scans the network for hosts
+    """
 
     def __init__(self):
         """ Define network and machine specific parameters """
         self.network = "10.88.88.0/24"
         self.interface = "vlan88"
         self.hosts = dict()
-        self.json = "/var/www/htdocs/devices/devices.json"
-        self.history = "/var/www/htdocs/devices/history.json"
         self.static_hosts = [
-                               '10.88.88.254', # Heimat
-                               '10.88.88.206', # AP
-                               '10.88.88.12', # chromecast
-                               '10.88.88.11', # scotty
-                               '10.88.88.17', # Hue
-                               '10.88.88.14', # Raspi Temperatur
-                               '10.88.88.10', # matomat
-                               '10.88.88.18', # WLAN AP
-			                   '10.88.88.233', # iPad - noqqe 20161022
-			                   '10.88.88.64', # KEINE AHNUNG - noqqe 20161022
-                            ]
+            '10.88.88.254', # Heimat
+            '10.88.88.206', # AP
+            '10.88.88.12', # chromecast
+            '10.88.88.11', # scotty
+            '10.88.88.17', # Hue
+            '10.88.88.14', # Raspi Temperatur
+            '10.88.88.10', # matomat
+            '10.88.88.18', # WLAN AP
+            '10.88.88.233', # iPad - noqqe 20161022
+            '10.88.88.64', # KEINE AHNUNG - noqqe 20161022
+        ]
+
         # for performance reasons, we currently disable nmap
         # self.scan_nmap()
         self.scan_arp()
@@ -76,7 +82,6 @@ class Collector(object):
         self.parse_arp(output)
 
 
-
     def parse_nmap(self, output):
         """ Parse output of nmap to a dictionary """
         matches = re.findall(r'scan report for\s+((?:\d{1,3}\.){3}\d{1,3}).*?MAC Address:\s+((?:[0-9A-F]{2}\:){5}[0-9A-F]{2})', output, re.M | re.S)
@@ -92,19 +97,89 @@ class Collector(object):
                 mac = e.split()[1].lower()
                 self.hosts[ip] = mac
 
-
-    def gen_json(self):
-        """ Generate json documents to output to documentroot """
+    def get_hosts(self):
+        """
+        Return hosts in the network
+        :returns: list
+        """
         self.hosts = self.substract_static_hosts(self.hosts)
-        doc = json.dumps({
-                            "online": len(self.hosts),
-                            "hosts": self.hosts
-                         })
+        return self.hosts
 
-        with open(self.json, "w") as f:
-            f.write(doc)
-            f.close()
+class Sensors(object):
 
-        return True
+    """Docstring for MyClass. """
 
-Collector().gen_json()
+    def __init__(self):
+        self.HOST = "scotty.intern.k4cg.org"
+        self.PORT = 31338
+        self.TEMP_UID = "tfj"
+        self.SOUND_UID = "voE"
+        self.LIGHT_UID = "xpa"
+        self.ipcon = IPConnection()
+
+
+    def get_temperature(self):
+        try:
+            t = BrickletTemperature(self.TEMP_UID, self.ipcon)
+            self.ipcon.connect(self.HOST, self.PORT)
+            temperature = t.get_temperature()
+            self.ipcon.disconnect()
+            return float(temperature/100.0)
+        except:
+            return None
+
+
+    def get_light(self):
+        try:
+            uvl = BrickletUVLight(self.LIGHT_UID, self.ipcon)
+            self.ipcon.connect(self.HOST, self.PORT)
+            uv_light = uvl.get_uv_light()
+            self.ipcon.disconnect()
+            return float(uv_light)
+        except:
+            return None
+
+    def get_sound(self):
+        try:
+            si = BrickletSoundIntensity(self.SOUND_UID, self.ipcon)
+            self.ipcon.connect(self.HOST, self.PORT)
+            intensity = si.get_intensity()
+            self.ipcon.disconnect()
+            return float(intensity)
+        except:
+            return None
+
+
+def gen_json(hosts, sound, light, temp):
+    """
+    Generate json documents to output to documentroot
+    """
+    document = "/var/www/htdocs/devices/devices.json"
+    doc = json.dumps({
+        "online": len(hosts),
+        "hosts": hosts,
+        "sound": sound,
+        "light": light,
+        "temp": temp,
+    })
+
+    with open(document, "w") as f:
+        f.write(doc)
+        f.close()
+
+    return True
+
+
+# Scan network
+sc = NetworkScanner()
+sc.scan_arp()
+hosts = sc.get_hosts()
+
+se = Sensors()
+sound = se.get_sound()
+light = se.get_light()
+temp = se.get_temperature()
+
+
+# Generate output
+gen_json(hosts, sound, light, temp)
