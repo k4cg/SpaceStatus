@@ -154,8 +154,10 @@ def gen_json(hosts, sound, light, temp):
     """
     Generate json documents to output to documentroot
     """
+    date = datetime.datetime.now().isoformat()
     document = "/var/www/htdocs/spacestatus/status.json"
     doc = json.dumps({
+        "date": date,
         "online": len(hosts),
         "hosts": hosts,
         "sound": sound,
