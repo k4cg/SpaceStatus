@@ -1,18 +1,16 @@
-# OpenStatus
+# SpaceStatus
 
-openstatus.py collects devices in our k4cg-intern wifi
-and generates json output into a documentroot
-that rezeptionistin can read
+spacestatus.py collects various data and puts them into a json format.
 
-# Goals 
+# The measurements
 
-at a later point we can also work with the collected
-data in a statistical way.
+* Temperature
+* UV Light
+* Devices in Wifi network
+* Sound intensity
+* another temperature
 
-If wanted, we can also specify users and their macadresses
-to show individuals being in the room
-
-# Method
+# Method for wifi collection
 
 At the moment only arp information is used.
 for performance reasons nmap scan is deactivated

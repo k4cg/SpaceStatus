@@ -111,7 +111,7 @@ class Sensors(object):
 
     def __init__(self):
         self.HOST = "scotty.intern.k4cg.org"
-        self.PORT = 31338
+        self.PORT = 4223
         self.TEMP_UID = "tfj"
         self.SOUND_UID = "voE"
         self.LIGHT_UID = "xpa"
@@ -154,7 +154,7 @@ def gen_json(hosts, sound, light, temp):
     """
     Generate json documents to output to documentroot
     """
-    document = "/var/www/htdocs/devices/devices.json"
+    document = "/var/www/htdocs/spacestatus/status.json"
     doc = json.dumps({
         "online": len(hosts),
         "hosts": hosts,
