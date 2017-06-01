@@ -27,21 +27,11 @@ class NetworkScanner(object):
 
     def __init__(self):
         """ Define network and machine specific parameters """
-        self.network = "10.88.88.0/24"
-        self.interface = "vlan88"
+        self.network = "192.168.178.0/24"
+        self.interface = "vio0"
         self.hosts = dict()
         self.static_hosts = [
-            '10.88.88.254', # Heimat
-            '10.88.88.206', # AP
-            '10.88.88.12', # chromecast
-            '10.88.88.11', # scotty
-            '10.88.88.17', # Hue
-            '10.88.88.14', # Raspi Temperatur
-            '10.88.88.10', # matomat
-            '10.88.88.18', # WLAN AP
-            '10.88.88.233', # iPad - noqqe 20161022
-            '10.88.88.64', # KEINE AHNUNG - noqqe 20161022
-        ]
+		]
 
         # for performance reasons, we currently disable nmap
         # self.scan_nmap()
@@ -110,7 +100,7 @@ class Sensors(object):
     """Docstring for MyClass. """
 
     def __init__(self):
-        self.HOST = "scotty.intern.k4cg.org"
+        self.HOST = "192.168.178.3"
         self.PORT = 4223
         self.TEMP_UID = "tfj"
         self.SOUND_UID = "voE"
