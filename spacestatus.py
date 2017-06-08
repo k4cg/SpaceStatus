@@ -8,11 +8,11 @@ at a later point we can also work with the collected
 data in a statistical way.
 """
 
-import re
-import commands
+import sys
 import json
 import datetime
 import requests
+import warnings
 
 from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_temperature import BrickletTemperature
@@ -27,72 +27,28 @@ class NetworkScanner(object):
 
     def __init__(self):
         """ Define network and machine specific parameters """
-        self.network = "192.168.178.0/24"
-        self.interface = "vio0"
+        self.ap_ip= "192.168.178.2"
         self.hosts = dict()
-        self.static_hosts = [
-		]
-
-        # for performance reasons, we currently disable nmap
-        # self.scan_nmap()
-        self.scan_arp()
-
-    def substract_static_hosts(self,hosts):
-        """ Used for substracting static hosts
-        like scotty, heimat, philips hue from the hosts
-        :returns: dict
-        """
-        for host in self.static_hosts:
-            try:
-                del self.hosts[host]
-            except KeyError:
-                pass
-        return self.hosts
-
-
-    def scan_nmap(self):
-        """ Scan network for Devices with nmap """
-        cmd = 'nmap --host-timeout 3 -sP -n %s' % (self.network)
-        (status, output) = commands.getstatusoutput(cmd)
-
-        if status:
-            sys.stderr.write('Error running nmap command')
-            return False
-
-        self.parse_nmap(output)
-
-    def scan_arp(self):
-        """ Execute arp scan """
-        cmd = "arp -a "
-        (status, output) = commands.getstatusoutput(cmd)
-
-        if status:
-            sys.stderr.write('Error running arp command')
-
-        self.parse_arp(output)
-
-
-    def parse_nmap(self, output):
-        """ Parse output of nmap to a dictionary """
-        matches = re.findall(r'scan report for\s+((?:\d{1,3}\.){3}\d{1,3}).*?MAC Address:\s+((?:[0-9A-F]{2}\:){5}[0-9A-F]{2})', output, re.M | re.S)
-        for match in matches:
-            ip = match[0]
-            self.hosts[ip] = match[1].lower()
-
-    def parse_arp(self, output):
-        """ Parse output of arp to a dictionary """
-        for e in output.split("\n"):
-            if not re.search('expired', e) and re.search(self.interface, e):
-                ip = e.split()[0]
-                mac = e.split()[1].lower()
-                self.hosts[ip] = mac
+        self.login = 'https://192.168.178.2/login.cgi'
+        self.user = sys.argv[1]
+        self.pw = sys.argv[2]
+        self.static_hosts = []
 
     def get_hosts(self):
         """
         Return hosts in the network
         :returns: list
         """
-        self.hosts = self.substract_static_hosts(self.hosts)
+        # arrange new session and login
+        s = requests.Session()
+        s.get(self.login, verify=False)
+
+        # query ip/status.cgi which results in json
+        r = s.post(self.login, verify=False, data={'username': self.user, 'password': self.pw, 'uri':'status.cgi'}).text
+        r = json.loads(r)
+
+        # fetch count of wireless connections from json
+        self.hosts = r['wireless']['count']
         return self.hosts
 
 class Sensors(object):
@@ -147,8 +103,8 @@ def gen_json(hosts, sound, light, temp):
     document = "/var/www/htdocs/spacestatus/status.json"
     doc = json.dumps({
         "date": date,
-        "online": len(hosts),
-        "hosts": hosts,
+        "online": hosts,
+        "hosts": [], # spec ip addresses dont work anymore
         "sound": sound,
         "light": light,
         "temp": temp,
@@ -160,10 +116,10 @@ def gen_json(hosts, sound, light, temp):
 
     return True
 
+warnings.filterwarnings('ignore', 'Unverified HTTPS request')
 
 # Scan network
 sc = NetworkScanner()
-sc.scan_arp()
 hosts = sc.get_hosts()
 
 se = Sensors()
