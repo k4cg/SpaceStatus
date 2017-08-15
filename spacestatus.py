@@ -101,7 +101,11 @@ def gen_json(hosts, sound, light, temp):
     """
     date = datetime.datetime.now().isoformat()
     document = "/var/www/htdocs/spacestatus/status.json"
-    doc = json.dumps({
+
+    with open(document, "r") as f:
+        doc_data = json.loads(f.read())
+
+    doc_data.update({
         "date": date,
         "online": hosts,
         "hosts": [], # spec ip addresses dont work anymore
@@ -111,7 +115,7 @@ def gen_json(hosts, sound, light, temp):
     })
 
     with open(document, "w") as f:
-        f.write(doc)
+        f.write(json.dumps(doc_data))
         f.close()
 
     return True
