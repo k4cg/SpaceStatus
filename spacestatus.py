@@ -94,8 +94,20 @@ class Sensors(object):
         except:
             return None
 
+class HeimatlicherServierer(object):
+    def __init__(self):
+        pass
 
-def gen_json(hosts, sound, light, temp):
+    def get_hservierer_status(self):
+        hserv_doc = "/var/www/htdocs/spacestatus/heimatlicher_status.json"
+        try:
+            open(hserv_doc, "r") as f:
+                data = json.loads(f.read())
+            return data
+        except:
+            return None
+
+def gen_json(hosts, sound, light, temp, hserv):
     """
     Generate json documents to output to documentroot
     """
@@ -112,6 +124,7 @@ def gen_json(hosts, sound, light, temp):
         "sound": sound,
         "light": light,
         "temp": temp,
+        "hservierer" : hserv
     })
 
     with open(document, "w") as f:
@@ -131,6 +144,9 @@ sound = se.get_sound()
 light = se.get_light()
 temp = se.get_temperature()
 
+# get data from heimatlicher servierer
+hs = HeimatlicherServierer()
+hsdata = hs.get_hservierer_status()
 
 # Generate output
-gen_json(hosts, sound, light, temp)
+gen_json(hosts, sound, light, temp, hsdata)
