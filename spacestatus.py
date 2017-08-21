@@ -101,7 +101,7 @@ class HeimatlicherServierer(object):
     def get_hservierer_status(self):
         hserv_doc = "/var/www/htdocs/spacestatus/heimatlicher_status.json"
         try:
-            open(hserv_doc, "r") as f:
+            with open(hserv_doc, "r") as f:
                 data = json.loads(f.read())
             return data
         except:
