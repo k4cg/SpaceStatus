@@ -136,8 +136,10 @@ def gen_json(hosts, sound, light, temp, hserv):
 warnings.filterwarnings('ignore', 'Unverified HTTPS request')
 
 # Scan network
-sc = NetworkScanner()
-hosts = sc.get_hosts()
+# FIXME AFTER UPGRADE OF ACCESS POINT
+# sc = NetworkScanner()
+# hosts = sc.get_hosts()
+hosts = 0
 
 se = Sensors()
 sound = se.get_sound()
