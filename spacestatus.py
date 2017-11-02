@@ -43,7 +43,7 @@ class NetworkScanner(object):
         s.get(self.login, verify=False)
 
         # query ip/status.cgi which results in json
-        r = s.post(self.login, verify=False, data={'username': self.user, 'password': self.pw, 'uri':'status.cgi'}).text
+        r = s.post(self.login, verify=False, data={'username': self.user, 'password': self.pw, 'uri':'/status.cgi'}).text
         r = json.loads(r)
 
         # fetch count of wireless connections from json
@@ -137,9 +137,9 @@ warnings.filterwarnings('ignore', 'Unverified HTTPS request')
 
 # Scan network
 # FIXME AFTER UPGRADE OF ACCESS POINT
-# sc = NetworkScanner()
-# hosts = sc.get_hosts()
-hosts = 0
+sc = NetworkScanner()
+hosts = sc.get_hosts()
+# hosts = 0
 
 se = Sensors()
 sound = se.get_sound()
