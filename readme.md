@@ -1,6 +1,7 @@
 # SpaceStatus
 
 spacestatus.py collects various data and puts them into a json format.
+spacestatus_mqtt.py collects the same data and pushed it to an mqtt server.
 
 # The measurements
 
