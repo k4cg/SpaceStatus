@@ -2,7 +2,6 @@
 from http.server import HTTPServer
 from http.server import BaseHTTPRequestHandler
 import json
-import cgi
 from urllib import parse
 
 doc_file = "/var/www/htdocs/spacestatus/heimatlicher_status.json"
