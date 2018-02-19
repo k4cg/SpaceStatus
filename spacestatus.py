@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 """
 openstatus.py collects devices in our k4cg-intern wifi
 and generates json output into a documentroot

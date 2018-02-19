@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 """
 openstatus.py collects devices in our k4cg-intern wifi
 and generates json output into a documentroot
@@ -43,7 +43,7 @@ class NetworkScanner(object):
         # arrange new session and login
         s = requests.Session()
         ans = s.get(self.login, verify=False)
-        print ans
+        print(ans)
 
         # query ip/status.cgi which results in json
         r = s.post(self.login, verify=False, data={'username': self.user, 'password': self.pw, 'uri':'/status.cgi'}).text
