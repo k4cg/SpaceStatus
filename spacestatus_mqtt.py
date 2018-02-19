@@ -83,6 +83,7 @@ class Sensors(object):
             uvl = BrickletUVLight(self.LIGHT_UID, self.ipcon)
             self.ipcon.connect(self.HOST, self.PORT)
             self.ipcon.disconnect()
+            uv_light = uvl.get_uv_light()
             return float(uv_light)
         except:
             return None
