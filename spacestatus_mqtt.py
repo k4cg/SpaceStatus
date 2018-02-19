@@ -16,7 +16,6 @@ import warnings
 
 from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_temperature import BrickletTemperature
-from tinkerforge.bricklet_accelerometer import BrickletAccelerometer
 from tinkerforge.bricklet_sound_intensity import BrickletSoundIntensity
 from tinkerforge.bricklet_uv_light import BrickletUVLight
 
