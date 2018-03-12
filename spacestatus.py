@@ -55,7 +55,7 @@ class Sensors(object):
     """Docstring for MyClass. """
 
     def __init__(self):
-        self.HOST = "192.168.178.3"
+        self.HOST = "192.168.178.124"
         self.PORT = 4223
         self.TEMP_UID = "tfj"
         self.SOUND_UID = "voE"
