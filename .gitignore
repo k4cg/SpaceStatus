@@ -108,3 +108,6 @@ venv.bak/
 # configs
 config.yaml
 config.py
+
+# status
+status.json
