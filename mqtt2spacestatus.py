@@ -51,16 +51,19 @@ def write_status(status, path="status.json"):
 # callback functions
 def on_message(client, userdata, msg):
     sensors = conf["sensors"]
+    print("topic: ", msg.topic, "message: ", str(msg.payload.decode("utf-8")))
     for sensor in sensors.keys():
         if msg.topic == sensors[sensor]["topic"]:
             if sensors[sensor]["msg_type"] == "json":
                 resp = json.loads(msg.payload.decode("utf-8"))
                 resp = resp[sensors[sensor]["src_field"]]
             else:
-                resp = msg.payload.decode("utf-8")
-                status.update({sensors[sensor]["dst_field"]: resp})
-        else:
-            print("topic: ", msg.topic, "message: ", str(msg.payload.decode("utf-8")))
+                try:
+                    resp = msg.payload.decode("utf-8").split()[1]
+                except IndexError:
+                    resp = msg.payload.decode("utf-8").split()[0]
+
+            status.update({sensors[sensor]["dst_field"]: resp})
 
 def on_connect(client, userdata, flags, rc):
     subscription_result = client.subscribe("sensors/#")
