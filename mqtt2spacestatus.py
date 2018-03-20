@@ -109,8 +109,8 @@ def handler_hosts(msg):
     :returns: dict
     """
 
-    resp = msg.payload.decode("utf-8").split()[1]
-    resp = float(resp)
+    resp = json.loads(msg.payload.decode("utf-8"))
+    resp = float(resp["online"])
     resp = { "online": resp }
     return resp
 
@@ -152,7 +152,7 @@ def on_message(client, userdata, msg):
         doc = handler_light(msg)
     elif msg.topic == "sensors/door/default/bme280/humidity":
         doc = handler_humidity(msg)
-    elif msg.topic == "sensors/spacestatus/online":
+    elif msg.topic == "sensors/wifi/online":
         doc = handler_hosts(msg)
     elif msg.topic == "sensors/door/default/status":
         doc = handler_door(msg)
