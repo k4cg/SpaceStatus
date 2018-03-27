@@ -110,7 +110,7 @@ def handler_hosts(msg):
     """
 
     resp = json.loads(msg.payload.decode("utf-8"))
-    resp = float(resp["online"])
+    resp = int(resp["online"])
     resp = { "online": resp }
     return resp
 
