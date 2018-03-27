@@ -122,9 +122,22 @@ def handler_door(msg):
     :returns: dict
     """
 
+    # parse message
     resp = json.loads(msg.payload.decode("utf-8"))
+
+    # fetch timestamp
+    timestamp = resp["_timestamp"]
+    timestamp =datetime.datetime.fromtimestamp(timestamp)
+
+    # fetch actual value
     resp = resp["value"]
-    resp = { "door": resp }
+
+    # if timestamp is older then 30 minutes
+    if timestamp < datetime.datetime.now()-datetime.timedelta(minutes=30):
+        resp = { "door": "unknown" }
+    else:
+        resp = { "door": resp }
+
     return resp
 
 ### On Message Parser
