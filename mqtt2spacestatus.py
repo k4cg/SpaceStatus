@@ -97,7 +97,7 @@ def handler_humidity(msg):
     """
 
     resp = json.loads(msg.payload.decode("utf-8"))
-    resp = resp["value"]
+    resp = float(resp["value"])
     resp = { "humidity": resp }
     return resp
 
@@ -180,5 +180,5 @@ if __name__ == "__main__":
     client.connect(conf['broker'])
 
     while True:
-        client.loop(5)
+        client.loop(30)
         write_status(status=status,path=conf['output'])
