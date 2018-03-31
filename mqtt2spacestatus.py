@@ -43,6 +43,9 @@ def write_status(status, path="status.json"):
     :returns: boolean
     """
 
+    if not bool(status):
+        return False
+
     status.update({"date": datetime.datetime.now().isoformat()})
     with open(path, "w") as jsonfile:
         jsonfile.write(json.dumps(status, indent=2, sort_keys=True))
