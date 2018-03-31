@@ -45,7 +45,7 @@ def write_status(status, path="status.json"):
 
     status.update({"date": datetime.datetime.now().isoformat()})
     with open(path, "w") as jsonfile:
-        jsonfile.write(json.dumps(status))
+        jsonfile.write(json.dumps(status, indent=2, sort_keys=True))
 
     return True
 
@@ -184,7 +184,7 @@ def on_connect(client, userdata, flags, rc):
 if __name__ == "__main__":
 
     conf = read_configuration()
-    status = read_status()
+    status = read_status(path=conf['output'])
 
     client = paho.Client(conf['username'])
     client.username_pw_set(conf['username'], conf['password'])
