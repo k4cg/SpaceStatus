@@ -32,7 +32,6 @@ def read_status(path="status.json"):
     try:
         with open(path, "r") as jsonfile:
             status = json.load(jsonfile)
-            jsonfile.close()
     except (IOError,json.decoder.JSONDecodeError) as e:
         status = {}
 
@@ -51,8 +50,7 @@ def write_status(status, path="status.json"):
 
     status.update({"date": datetime.datetime.now().isoformat()})
     with open(path, "w") as jsonfile:
-        jsonfile.write(json.dumps(status, indent=2, sort_keys=True))
-        jsonfile.close()
+        json.dump(status, jsonfile, indent=2, sort_keys=True))
 
     return True
 
