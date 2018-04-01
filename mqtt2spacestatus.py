@@ -15,8 +15,9 @@ def read_configuration(path="config.yaml"):
     :path: str
     :returns: dict
     """
-    with open(path) as conffile:
+    with open(path, "r") as conffile:
         conf = yaml.load(conffile)
+        conffile.close()
 
     return conf
 
@@ -31,7 +32,8 @@ def read_status(path="status.json"):
     try:
         with open(path, "r") as jsonfile:
             status = json.load(jsonfile)
-    except IOError:
+            jsonfile.close()
+    except (IOError,json.decoder.JSONDecodeError) as e:
         status = {}
 
     return status
@@ -50,6 +52,7 @@ def write_status(status, path="status.json"):
     status.update({"date": datetime.datetime.now().isoformat()})
     with open(path, "w") as jsonfile:
         jsonfile.write(json.dumps(status, indent=2, sort_keys=True))
+        jsonfile.close()
 
     return True
 
