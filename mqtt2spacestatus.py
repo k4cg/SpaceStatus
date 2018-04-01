@@ -3,6 +3,7 @@
 
 import sys
 import datetime
+from dateutil.parser import parse
 import paho.mqtt.client as paho
 import yaml
 import json
@@ -53,7 +54,12 @@ def write_status(status, path="status.json"):
     return True
 
 def log(handler, timestamp, value):
-    print("Handler: %s, Timestamp %s, Value: %s" % (handler, timestamp, value), flush=True)
+    try:
+        ts = parse(str(timestamp))
+    except ValueError:
+        ts = datetime.datetime.fromtimestamp(timestamp)
+
+    print("Handler: %s, Timestamp %s, Value: %s" % (handler, ts, value), flush=True)
 
 def handler_temperature(msg):
     """
@@ -126,7 +132,7 @@ def handler_hosts(msg):
     resp = json.loads(msg.payload.decode("utf-8"))
     ts = resp["_timestamp"]
     online = int(resp["online"])
-    resp = { "online": resp }
+    resp = { "online": online }
     log("hosts", ts, online)
     return resp
 
@@ -157,6 +163,21 @@ def handler_door(msg):
     log("door", timestamp, door)
     return resp
 
+def handler_octopi(msg):
+    """
+    Parses octopi 3d printer data
+    :msg: message object from mqtt
+    :returns: dict
+    """
+
+    resp = json.loads(msg.payload.decode("utf-8"))
+    ts = resp["_timestamp"]
+    progress = float(resp["progress"])
+    resp = { "octopi_progress": progress}
+    log("octopi", ts, progress)
+    return resp
+
+
 ### On Message Parser
 def on_message(client, userdata, msg):
     """
@@ -186,6 +207,8 @@ def on_message(client, userdata, msg):
         doc = handler_hosts(msg)
     elif msg.topic == "sensors/door/default/status":
         doc = handler_door(msg)
+    elif msg.topic == "sensors/octopi/progress/printing":
+        doc = handler_octopi(msg)
     else:
         doc = {}
 
