@@ -217,6 +217,7 @@ def on_message(client, userdata, msg):
 
     # update internal dict with latest data (any)
     status.update(doc)
+    write_status(status=status,path=conf['output'])
 
     return True
 
@@ -237,4 +238,3 @@ if __name__ == "__main__":
 
     while True:
         client.loop(30)
-        write_status(status=status,path=conf['output'])
