@@ -50,7 +50,7 @@ def write_status(status, path="status.json"):
 
     status.update({"date": datetime.datetime.now().isoformat()})
     with open(path, "w") as jsonfile:
-        json.dump(status, jsonfile, indent=2, sort_keys=True))
+        json.dump(status, jsonfile, indent=2, sort_keys=True)
 
     return True
 
