@@ -52,6 +52,9 @@ def write_status(status, path="status.json"):
 
     return True
 
+def log(handler, timestamp, value):
+    print("Handler: %s, Timestamp %s, Value: %s" % (handler, timestamp, value), flush=True)
+
 def handler_temperature(msg):
     """
     Parses temperature message from topic
@@ -61,8 +64,10 @@ def handler_temperature(msg):
     """
 
     resp = json.loads(msg.payload.decode("utf-8"))
-    resp = resp["temperature"] / 100
-    resp = { "temperature": resp }
+    ts = resp["_timestamp"]
+    temp = resp["temperature"] / 100
+    resp = { "temperature": temp }
+    log("temperature", ts, temp)
     return resp
 
 def handler_sound(msg):
@@ -74,8 +79,10 @@ def handler_sound(msg):
     """
 
     resp = json.loads(msg.payload.decode("utf-8"))
-    resp = resp["intensity"]
-    resp = { "sound": resp }
+    ts = resp["_timestamp"]
+    sound = resp["intensity"]
+    resp = { "sound": sound }
+    log("sound", ts, sound)
     return resp
 
 def handler_light(msg):
@@ -87,8 +94,10 @@ def handler_light(msg):
     """
 
     resp = json.loads(msg.payload.decode("utf-8"))
-    resp = resp["uv_light"]
-    resp = { "light": resp }
+    ts = resp["_timestamp"]
+    light = resp["uv_light"]
+    resp = { "light": light}
+    log("light", ts, light)
     return resp
 
 def handler_humidity(msg):
@@ -100,8 +109,10 @@ def handler_humidity(msg):
     """
 
     resp = json.loads(msg.payload.decode("utf-8"))
-    resp = float(resp["value"])
-    resp = { "humidity": resp }
+    ts = resp["_timestamp"]
+    hum = float(resp["value"])
+    resp = { "humidity": hum}
+    log("humidity", ts, hum)
     return resp
 
 def handler_hosts(msg):
@@ -113,8 +124,10 @@ def handler_hosts(msg):
     """
 
     resp = json.loads(msg.payload.decode("utf-8"))
-    resp = int(resp["online"])
+    ts = resp["_timestamp"]
+    online = int(resp["online"])
     resp = { "online": resp }
+    log("hosts", ts, online)
     return resp
 
 def handler_door(msg):
@@ -133,14 +146,15 @@ def handler_door(msg):
     timestamp =datetime.datetime.fromtimestamp(timestamp)
 
     # fetch actual value
-    resp = resp["value"]
+    door = resp["value"]
 
     # if timestamp is older then 30 minutes
     if timestamp < datetime.datetime.now()-datetime.timedelta(minutes=30):
         resp = { "door": "unknown" }
     else:
-        resp = { "door": resp }
+        resp = { "door": door}
 
+    log("door", timestamp, door)
     return resp
 
 ### On Message Parser
