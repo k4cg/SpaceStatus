@@ -35,7 +35,6 @@ def read_status(path="status.json"):
     try:
         with open(path, "r") as jsonfile:
             status = json.load(jsonfile)
-            print(status)
     except (IOError,json.decoder.JSONDecodeError):
         status = {}
 
