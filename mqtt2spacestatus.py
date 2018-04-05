@@ -7,6 +7,9 @@ from dateutil.parser import parse
 import paho.mqtt.client as paho
 import yaml
 import json
+import time
+from _thread import start_new_thread
+import copy
 
 
 def read_configuration(path="config.yaml"):
@@ -32,27 +35,30 @@ def read_status(path="status.json"):
     try:
         with open(path, "r") as jsonfile:
             status = json.load(jsonfile)
-    except (IOError,json.decoder.JSONDecodeError) as e:
+            print(status)
+    except (IOError,json.decoder.JSONDecodeError):
         status = {}
 
     return status
 
 def write_status(status, path="status.json"):
     """
-    Persists the current status to the json file
-    and adds the latest timestamp
+    Checks every some seconds if current status has changed.
+    On Change it adds the latest timestamp and persists to json file.
     :status: dict
-    :returns: boolean
     """
 
-    if not bool(status):
-        return False
+    old_status = {}
 
-    status.update({"date": datetime.datetime.now().isoformat()})
-    with open(path, "w") as jsonfile:
-        json.dump(status, jsonfile, indent=2, sort_keys=True)
+    while True:
+        # Write file only if necessary
+        if old_status != status:
+            status.update({"date": datetime.datetime.now().isoformat()})
+            with open(path, "w") as jsonfile:
+                json.dump(status, jsonfile, indent=2, sort_keys=True)
+            old_status = copy.copy(status)
 
-    return True
+        time.sleep(5)
 
 def log(handler, timestamp, value):
     try:
@@ -215,13 +221,12 @@ def on_message(client, userdata, msg):
 
     # update internal dict with latest data (any)
     status.update(doc)
-    write_status(status=status,path=conf['output'])
 
     return True
 
 
 def on_connect(client, userdata, flags, rc):
-    subscription_result = client.subscribe("sensors/#")
+    client.subscribe("sensors/#")
 
 if __name__ == "__main__":
 
@@ -234,5 +239,6 @@ if __name__ == "__main__":
     client.on_connect = on_connect
     client.connect(conf['broker'])
 
-    while True:
-        client.loop(30)
+    # Trigger file writing asynchronous
+    start_new_thread(write_status, (status, conf['output']))
+    client.loop_forever()
