@@ -20,7 +20,6 @@ def read_configuration(path="config.yaml"):
     """
     with open(path, "r") as conffile:
         conf = yaml.load(conffile)
-        conffile.close()
 
     return conf
 
