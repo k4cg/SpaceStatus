@@ -1,5 +1,7 @@
 # SpaceStatus
 
+Replaced with [k4status](https://github.com/k4cg/k4status)
+
 spacestatus.py collects various data and puts them into a json format.
 spacestatus_mqtt.py collects the same data and pushed it to an mqtt server.
 
